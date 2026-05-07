@@ -16,20 +16,18 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }} # Requires a Service Account key secret
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Configure Docker for Artifact Registry
         run: |
-          # Replace us-central1 with your actual region if different
           gcloud auth configure-docker us-central1-docker.pkg.dev
 
       - name: Build and Push
         run: |
-          # TODO: Replace with your actual GCP Project ID and Registry name
-          REGISTRY="us-central1-docker.pkg.dev/YOUR_PROJECT_ID/YOUR_REGISTRY_NAME"
+          REGISTRY="us-central1-docker.pkg.dev/lpr-gemini-enterprise-1/agent-cli-image"
           IMAGE_NAME="$REGISTRY/agent-cli-runner"
           
           TAG="latest"
@@ -40,7 +38,6 @@ jobs:
           docker build -t $IMAGE_NAME:$TAG .
           docker push $IMAGE_NAME:$TAG
           
-          # Also push 'latest' tag if it's a version tag
           if [ "$TAG" != "latest" ]; then
             docker tag $IMAGE_NAME:$TAG $IMAGE_NAME:latest
             docker push $IMAGE_NAME:latest
